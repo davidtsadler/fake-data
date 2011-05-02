@@ -4,6 +4,7 @@ require "bundler/setup"
 require 'active_record'
 require 'sqlite3'
 require 'yaml'
+require 'logger'
 
 namespace :fake_data do
   namespace :db do 
@@ -14,7 +15,7 @@ namespace :fake_data do
 
     task :enviroment do
       ActiveRecord::Base.establish_connection(YAML::load(File.open('config/database.yml')))
-      #ActiveRecord::Base.logger = Logger.new(File.open('log/database.log','a'))
+      ActiveRecord::Base.logger = Logger.new(File.open('log/database.log','a'))
     end
   end
 end
