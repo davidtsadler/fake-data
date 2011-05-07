@@ -10,11 +10,13 @@ One example is that I will be scanning my mp3 music collection and storing all t
 * ActiveRecord used to access the database.
 * Rake tasks for generating the database.
 * Rake tasks for exporting data into various formats.
+* Dependencies managed with [*Bundler*](http://gembundler.com/)
 
 ## Usage
 
 * Clone this repository with `git://github.com/davidtsadler/fake-data.git`
 * Change into the directory `cd fake-data`
+* Get required dependencies with `bundle install`
 * Use the provided *config/config.yml.example* file as the basis for your configuration. `cp config/config.yml.example config/config.yml`
 * Edit *config/config.yml* and specify any configuration settings you require.
 * Create the required database tables with `rake fake_data:db:migrate` 
