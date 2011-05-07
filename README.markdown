@@ -13,8 +13,8 @@ One example is that I will be scanning my mp3 music collection and storing all t
 
 ## Usage
 
-* Clone this repository with `git://github.com/davidtsadler/fake_data.git`
-* Change into the directory `cd fake_data`
+* Clone this repository with `git://github.com/davidtsadler/fake-data.git`
+* Change into the directory `cd fake-data`
 * Use the provided *config/config.yml.example* file as the basis for your configuration. `cp config/config.yml.example config/config.yml`
 * Edit *config/config.yml* and specify any configuration settings you require.
 * Create the required database tables with `rake fake_data:db:migrate` 
