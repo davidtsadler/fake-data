@@ -1,0 +1,8 @@
+# Array of directories where mp3 files are located.
+music_dirs:
+
+# Dropbox user id.
+dropbox_user_id:
+
+# Path to your dropbox folder
+dropbox_path:
