@@ -129,7 +129,8 @@ private
 
     unless album
       album = Album.find_or_initialize_by_uri(:uri => uri,
-        :name => name
+        :name => name,
+        :cover => get_album_cover(uri)
       )
       if ! album.save then
         puts "Unable to save information for the album #{name} : #{uri}"
@@ -147,6 +148,12 @@ private
     end
 
     album
+  end
+
+  def get_album_cover(directory)
+    filename = directory + "/album.jpg"
+    return nil if !FileTest.exists?(filename)
+    File.read(filename) 
   end
 
   def delete_orphaned_tracks()

@@ -3,6 +3,7 @@ class CreateAlbums < ActiveRecord::Migration
     create_table :albums do |t|
       t.string :name, :null => false
       t.string :uri, :null => false
+      t.binary :cover, :null => true
       t.timestamps
     end
 
