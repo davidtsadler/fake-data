@@ -17,6 +17,8 @@ require 'artist'
 require 'album'
 require 'track'
 
+require 'digest/md5'
+
 namespace :fake_data do
   desc 'Loads the config file into an instance variable to be used by other tasks'
   task :load_config do
@@ -64,6 +66,20 @@ namespace :fake_data do
       Album.delete_all
       Track.delete_all
       MediaLocation.delete_all
+    end
+  end
+
+  namespace :dropbox do
+    desc 'Save album covers into dropbox directory'
+    task :save_album_covers => 'fake_data:load_config' do
+      dropbox_dir = create_dropbox_directory('album_covers')
+      albums = Album.with_cover.all
+      num_albums = albums.size
+      albums.each_with_index do |album, number|
+        puts "[#{number+1} of #{num_albums}] Saving album cover for '#{album.name}'"
+        album.cover_url = save_album_cover(album, dropbox_dir)        
+        album.save
+      end
     end
   end
 
@@ -190,4 +206,29 @@ private
     end
 		files
 	end
+
+  def save_album_cover(album, directory) 
+    save_dropbox_file(directory, Digest::MD5.hexdigest(album.uri) + ".jpg", album.cover)
+  end
+
+  def create_dropbox_directory(directory)
+    dropbox_dir = File.join(@config['dropbox_path'], 'Public', directory)
+    `mkdir #{dropbox_dir}` unless File.exists? dropbox_dir
+    dropbox_dir 
+  end
+
+  def save_dropbox_file(directory, filename, data)
+    dir = File.join(directory, filename)
+    file = File.open(dir, 'w+b')
+    file.puts data
+    file.close
+    dropbox_public_link(dir)
+  end
+
+  def dropbox_public_link(directory)
+    dir = File.dirname(directory)
+    filename = File.basename(directory)
+    dir.sub!("#{@config['dropbox_path']}\/Public", "http://dl.dropbox.com/u/#{@config['dropbox_user_id']}")
+    File.join(dir, filename)
+  end
 end
