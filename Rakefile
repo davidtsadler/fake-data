@@ -18,6 +18,7 @@ require 'album'
 require 'track'
 
 require 'digest/md5'
+require 'csv'
 
 namespace :fake_data do
   desc 'Loads the config file into an instance variable to be used by other tasks'
@@ -79,6 +80,21 @@ namespace :fake_data do
         puts "[#{number+1} of #{num_albums}] Saving album cover for '#{album.name}'"
         album.cover_url = save_album_cover(album, dropbox_dir)        
         album.save
+      end
+    end
+  end
+
+  namespace :export do
+    namespace :powa do
+      desc 'Export album information as a CSV file suitible for importing into a Powa store.'
+      task :albums do
+        directory = 'export/powa'
+        create_directory(directory)
+        csv = CSV.open(File.join(directory, 'albums.csv'), 'w+')
+        Album.with_cover.order('name ASC').all.each do |album|
+          csv << album.to_powa
+        end
+        csv.close
       end
     end
   end
@@ -174,7 +190,7 @@ private
 
   def delete_orphaned_tracks()
     puts "Deleting orphaned tracks"
-    # Build an array with the ids of tracks whos files no longer exists.
+    # Build an array with the ids of tracks who's files no longer exists.
     ids = Track.all.collect { |track| FileTest.exists?(track.uri) ? nil : track.id}.compact
     Track.delete(ids) unless ids.size == 0
   end
@@ -188,7 +204,7 @@ private
 
   def  delete_orphaned_artists()
     puts "Deleting orphaned artist"
-    # Build an array with the ids of artis who no longer have any albums.
+    # Build an array with the ids of artist who no longer have any albums.
     ids = Artist.all.collect { |artist| artist.albums.size > 0 ? nil : artist.id}.compact
     Artist.delete(ids) unless ids.size == 0
   end
@@ -213,7 +229,7 @@ private
 
   def create_dropbox_directory(directory)
     dropbox_dir = File.join(@config['dropbox_path'], 'Public', directory)
-    `mkdir #{dropbox_dir}` unless File.exists? dropbox_dir
+    create_directory(dropbox_dir)
     dropbox_dir 
   end
 
@@ -230,5 +246,9 @@ private
     filename = File.basename(directory)
     dir.sub!("#{@config['dropbox_path']}\/Public", "http://dl.dropbox.com/u/#{@config['dropbox_user_id']}")
     File.join(dir, filename)
+  end
+
+  def create_directory(directory)
+    `mkdir -p #{directory}` unless File.exists? directory
   end
 end

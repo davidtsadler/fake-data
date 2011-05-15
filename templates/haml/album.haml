@@ -1,0 +1,5 @@
+%h1= album.name
+%h2= album.artist_name
+%ol
+  - tracks.each do |track|
+    %li= track.title
